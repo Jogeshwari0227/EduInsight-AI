@@ -79,26 +79,41 @@ else:
             st.bar_chart(chart_data)
 
             # --- HIGHLIGHTED STRATEGIC ACTION SECTION ---
+            # --- DYNAMIC PERSONALIZED INTERVENTION SECTION ---
             st.markdown("---")
-            st.markdown("## 🎯 STRATEGIC INTERVENTION PLAN")
+            st.markdown("## 🎯 PERSONALIZED STRATEGIC INTERVENTION")
             
-            # Create a large highlighted box for the Action
+            # 1. Identify the specific weakness for THIS student
+            metrics_dict = {
+                "Class Participation (Hands Raised)": raised_hands,
+                "Resource Engagement": resources,
+                "Content Awareness (Announcements)": announcements,
+                "Peer Collaboration (Discussion)": discussion
+            }
+            # Find the metric with the lowest value
+            weakest_metric = min(metrics_dict, key=metrics_dict.get)
+            weakest_score = metrics_dict[weakest_metric]
+
+            # 2. Generate Tiered + Personalized Cards
             with st.container(border=True):
+                # Tier Logic based on Prediction
                 if prediction == 2:
-                    st.markdown("### 🌟 FOCUS: ENRICHMENT & LEADERSHIP")
-                    st.write("**IMMEDIATE ACTION:** Assign as a Peer Mentor. Task this student with leading a 10-minute recap of next week's lecture.")
-                    st.info("💡 **Why?** This prevents stagnation and utilizes their high engagement to help others.")
+                    st.success(f"### 🌟 FOCUS: ENRICHMENT (Current Strength: {max(metrics_dict, key=metrics_dict.get)})")
+                    st.write(f"**STRATEGY:** Even though the student is high-performing, their **{weakest_metric}** is relatively lower ({weakest_score}).")
+                    st.write(f"**IMMEDIATE ACTION:** Task this student with creating a 'Study Guide' based on {weakest_metric} to help peers. This will turn their minor weakness into a leadership opportunity.")
                 
                 elif prediction == 1:
-                    st.markdown("### 🟠 FOCUS: PERFORMANCE MAINTENANCE")
-                    st.write("**IMMEDIATE ACTION:** Schedule a bi-weekly check-in. Set a goal to increase their lowest metric by 15 points.")
-                    st.info("💡 **Why?** Medium performers are in the 'swing' zone; consistent monitoring prevents a drop to 'Low'.")
+                    st.warning(f"### 🟠 FOCUS: MAINTENANCE (Target: {weakest_metric})")
+                    st.write(f"**STRATEGY:** To prevent a performance drop, we must stabilize **{weakest_metric}**.")
+                    st.write(f"**IMMEDIATE ACTION:** Set a specific goal: Increase {weakest_metric} by 15 points within two weeks. Schedule a brief follow-up to check their dashboard engagement.")
                 
                 else:
-                    st.markdown("### 🚨 FOCUS: CRITICAL RECOVERY")
-                    st.write("**IMMEDIATE ACTION:** Mandatory 1-on-1 counseling. Create a 'Behavioral Contract' focused on attendance and resource usage.")
-                    st.info("💡 **Why?** Early intervention here can improve final performance by up to 30%.")
+                    st.error(f"### 🚨 FOCUS: CRITICAL RECOVERY (Priority: {weakest_metric})")
+                    st.write(f"**STRATEGY:** The student is at risk primarily due to low **{weakest_metric}** and overall behavioral patterns.")
+                    st.write(f"**IMMEDIATE ACTION:** Immediate 1-on-1 counseling session. Provide a curated 'Action Folder' specifically for {weakest_metric} to reduce their barrier to entry.")
 
-            # Additional Alerts
-            if abs_val == 1:
-                st.warning("**ATTENDANCE ALERT:** Student is exceeding the absence threshold. Prioritize attendance recovery.")
+                # 3. Always-on Attendance Alert (Based on xAPI Dataset features)
+                if abs_val == 1:
+                    st.divider()
+                    st.markdown("#### 🚩 URGENT: Attendance Alert")
+                    st.write("This student has exceeded 7 days of absence.")
